@@ -33,7 +33,7 @@ def main_parser(cian_page_n, okrug):
     headers = {'User-Agent': UserAgent().chrome}
 
     main_page = f'https://www.cian.ru/cat.php?deal_type=sale&district%5B0%5D={okrug}&engine_version=2&offer_type=flat&p={cian_page_n}&room1=1&room2=1&room3=1&room4=1&room5=1&room9=1&sort=creation_date_desc'
-    #print(main_page)
+    
     main_response = session.get(main_page, headers=headers)
     if main_response.status_code == 200:
         main_response.encoding = 'utf-8'
@@ -82,10 +82,6 @@ def main_parser(cian_page_n, okrug):
                             price = fetch_price(price_spans, '₽')
                         if price_per_sqm is None:
                             price_per_sqm = fetch_price(price_per_sqm_spans, '₽/м²')
-                        #if price is not None:
-                            #print("Цена:", price)
-                        #if price_per_sqm is not None:
-                            #print("Цена за м²: ", price_per_sqm)
                         for item in floor_spans:
                             if 'из' in item.text:
                                 floor = item.text.strip().replace('из', '').split(' ')
@@ -94,8 +90,7 @@ def main_parser(cian_page_n, okrug):
                                     overall_floor = floor[2]
                                 except:
                                     pass
-                                #print("Этаж:", offer_floor)
-                                #print("Всего этажей:", overall_floor)
+                                
 
                         title = offer_tree.find('h1', class_='a10a3f92e9--title--vlZwT').text.strip()
                         if title[10] != 'А' and title[10] != 'С':
@@ -108,15 +103,10 @@ def main_parser(cian_page_n, okrug):
                         tip = False
                         isapart = title[18:26]
                         sq = (title[title.find(',')+2:].replace(' м²', '').replace(',', '.'))
-                        #print('Количество комнат: ', n_rooms)
+                        
                         if isapart != 'квартира':
                             tip = True
-                        #print('Апартамент?: ', tip)
-                        #print('Площадь : ', sq)
-                        #print('Округ: ', loc_inf[1])
-                        #print('Район: ', loc_inf[2])
-                        #print('Год постройки: ', building_age)
-                        #print('Время до метро: ', transport_times[1].replace(' мин.', ''))
+                       
                         offer_mas.append(offer_link) 
                         offer_mas.append(price) 
                         offer_mas.append(price_per_sqm)
@@ -139,7 +129,7 @@ def main_parser(cian_page_n, okrug):
                         print(f"Ошибка {offer_response.status_code}, попытка {attempts}...")
                 except requests.RequestException as e:
                     print(f"Ошибка запроса: {e}, попытка {attempts}...")
-                #time.sleep(1)  # Пауза перед следующей попыткой
+                
 
             if price is None or price_per_sqm is None:
                 print("Не удалось получить всю информацию после 5 попыток")
@@ -169,4 +159,4 @@ with open('cian_offers.csv', 'w', newline='') as csvfile:
             writer.writerow({fields[0]: final_result[i][0], fields[1]: final_result[i][1], fields[2]: final_result[i][2], fields[3]: final_result[i][3], fields[4]: final_result[i][4], fields[5]: final_result[i][5], fields[6]: final_result[i][6], fields[7]: final_result[i][7], fields[8]: final_result[i][8], fields[9]: final_result[i][9], fields[10]: final_result[i][10], fields[11]: final_result[i][11]})
         except:
             pass  
-#resulting file - cian_offers.csv with approximately 4000 entries
+#resulting file - cian_offers.csv with approximately 7700 entries
